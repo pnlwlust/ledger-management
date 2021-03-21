@@ -5,12 +5,16 @@ import {fileURLToPath} from "url";
 
 import initLogger  from './logger/index.js';
 import initRoutes from './routes/index.js';
+import config from "./config/index.js";
+import connectDatabase from "./db/db.js";
 
 const app = express();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+//init db
+connectDatabase(config.db);
 //init logger
 initLogger(app);
 app.use(express.json());
