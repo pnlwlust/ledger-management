@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const connectDataBase = async (dbConfig) => {
   let url = `mongodb://${dbConfig.host}:${dbConfig.port}/${dbConfig.databaseName}`;
@@ -11,7 +11,7 @@ const connectDataBase = async (dbConfig) => {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true,
-    autoIndex: true
+    autoIndex: true,
   });
 
   return db;

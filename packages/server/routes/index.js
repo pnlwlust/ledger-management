@@ -1,5 +1,4 @@
-
-import usersRoutes from './users.routes.js';
+import usersRoutes from "./users.routes.js";
 export default (app) => {
-    usersRoutes(app);
-}
+  usersRoutes(app);
+};

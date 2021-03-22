@@ -1,8 +1,8 @@
 export default class ResponseError extends Error {
   constructor({
     statusCode = 500,
-    code = 'server_error',
-    message = 'Server error'
+    code = "server_error",
+    message = "Server error",
   }) {
     super();
 
@@ -13,9 +13,9 @@ export default class ResponseError extends Error {
 
   response() {
     return {
-      object: 'error',
+      object: "error",
       code: this.code,
-      message: this.message
+      message: this.message,
     };
   }
 }

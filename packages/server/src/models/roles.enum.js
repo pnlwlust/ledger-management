@@ -1,12 +1,9 @@
 const Roles = Object.freeze({
-  ADMIN: 'ADMIN',
-  USER: 'USER',
+  ADMIN: "ADMIN",
+  USER: "USER",
   all() {
-    return [
-      this.ADMIN,
-      this.USER
-    ];
-  }
+    return [this.ADMIN, this.USER];
+  },
 });
 
 export default Roles;
