@@ -1,5 +1,6 @@
 import ResponseError from "../../errors/ResponseError.js";
 import UserRepository from "../repositories/users.repository.js";
+import mongoose from "mongoose";
 
 export function createUser(params) {
   const { username, password, confirmPassword, role, name } = params;
@@ -37,4 +38,8 @@ export async function resetPassword(id, params) {
     throw { status: 413, error: "Cannot use previous password" };
 
   return UserRepository.update(id, { password });
+}
+
+export async function deleteUser(id) {
+  return UserRepository.delete(id);
 }

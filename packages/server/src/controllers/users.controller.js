@@ -68,3 +68,17 @@ export async function listUsers(req, res, next) {
     next(err);
   }
 }
+
+export async function deleteUser(req, res, next) {
+  try {
+    const { id } = req.params;
+    const user = await userService.deleteUser(id);
+    return res.status(200).json({
+      object: 'user',
+      status: 'deleted',
+      user
+    });
+  } catch (error) {
+    return next(error);
+  }
+}

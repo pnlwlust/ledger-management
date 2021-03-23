@@ -1,10 +1,6 @@
 import mongoose from "mongoose";
 import chai from "chai";
-import User from "../../../src/services/user/user.model.js";
-import connectDatabase from "../../../src/utils/db.js";
-import config from "../../../src/config/db.js";
-
-import "../../setupApi.js";
+import User from "../../src/models/users.model.js";
 
 const { expect } = chai;
 
@@ -26,7 +22,7 @@ xdescribe("User model", () => {
 
   it("should save user if username and password are valid", (done) => {
     const user = new User({
-      email: "testing@testing.com",
+      username: "testing@testing.com",
       password: "testing@123",
     });
 
@@ -38,7 +34,7 @@ xdescribe("User model", () => {
 
   it("should have created_at and updated_at dates", () => {
     const user = new User({
-      email: "testing@testing.com",
+      username: "testing@testing.com",
       password: "testing@123",
     });
 

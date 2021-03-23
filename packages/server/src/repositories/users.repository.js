@@ -42,5 +42,13 @@ const UserRepository = {
   findAll(options) {
     return User.find({where:{...options}});
   },
+
+  delete: async (id) =>{
+    if (!mongoose.Types.ObjectId.isValid(id)) throw new UserNotFound();
+
+    const user = await UserRepository.findById(id);
+
+    return user.delete();
+  }
 };
 export default UserRepository;

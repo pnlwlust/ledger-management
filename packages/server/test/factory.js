@@ -2,7 +2,7 @@ import Roles from "../src/models/roles.enum.js";
 import User from "../src/models/users.model.js";
 
 export async function createUser({
-  email = "user@email.com",
+  username = "user@email.com",
   password = "password",
   role = Roles.USER,
   dateOfBirth = Date("1990-01-01"),
@@ -13,7 +13,7 @@ export async function createUser({
   ...rest
 } = {}) {
   return User.create({
-    email,
+    username,
     password,
     role,
     name,
@@ -24,7 +24,7 @@ export async function createUser({
 
 export async function createAdmin(params = {}) {
   return createUser({
-    email: "admin@wuna.com",
+    username: "admin@wuna.com",
     ...params,
     role: Roles.ADMIN,
   });

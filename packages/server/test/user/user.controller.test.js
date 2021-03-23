@@ -1,28 +1,45 @@
 import chai from "chai";
 import chaiHttp from "chai-http";
-import jwt from "jsonwebtoken";
-import { server } from "../../../src/server.js";
-import User from "../../../src/services/user/user.model.js";
-import AccountStatus from "../../../src/services/user/user/accountstatus.enum.js";
-import Roles from "../../../src/services/user/user/roles.enum.js";
+import  {server}  from "../../bin/www.js";
+import User from "../../src/models/users.model.js";
+import Roles from "../../src/models/roles.enum.js";
 
-import { createUser, createAdmin } from "../../factory.js";
-import createJwt from "../../testHelpers/createJwt.js";
+import { createUser, createAdmin } from "../factory.js";
+import {createJwt} from "../../src/services/auth.service.js";
+import mongoose from "mongoose";
 
 const { expect } = chai;
 chai.use(chaiHttp);
+before(function (done) {
+  mongoose.connect(process.env.MONGOOSE_TEST_URI || 'mongodb://localhost/test', {
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useFindAndModify: false
+
+  });
+  done();
+});
+
+after(function (done) {
+  mongoose.disconnect();
+  done();
+});
 
 describe("POST /users/login", function () {
-  describe("when email and password matches", () => {
-    it("responds with bearer token", async () => {
-      const email = "john@gmail.com";
-      const password = "password";
-      await createUser({ email });
-
-      const response = await chai
+  const username = "john@gmail.com";
+  const password = "password";
+  beforeEach(async function () {
+    await createUser({ username, password });
+  })
+  afterEach(async function () {
+    await mongoose.connection.db.dropDatabase();
+  })
+  describe("when passing correct username and password", async () => {
+    const response = await chai
         .request(server)
         .post("/users/login")
-        .send({ email, password });
+        .send({ username, password });
+    it("responds with bearer token", async () => {
 
       expect(response).to.have.status(201);
       expect(response.body.object).to.equal("token");
@@ -37,7 +54,7 @@ describe("POST /users/login", function () {
       const response = await chai
         .request(server)
         .post("/users/login")
-        .send({ email: "test@test.com", password: "random" });
+        .send({ username: "test@test.com", password: "random" });
 
       expect(response).to.have.status(401);
       expect(response.body.object).to.equal("error");
@@ -50,14 +67,10 @@ describe("POST /users/login", function () {
 
   describe("when password is incorrect", () => {
     it("responds with authentication error", async () => {
-      const email = "john@gmail.com";
-      const password = "password";
-      await createUser({ email, password });
-
       const response = await chai
         .request(server)
         .post("/users/login")
-        .send({ email, password: "random" });
+        .send({ username, password: "random" });
 
       expect(response).to.have.status(401);
       expect(response.body.object).to.equal("error");
@@ -75,15 +88,16 @@ describe("POST /users", () => {
       it("responds with validation error", async () => {
         const response = await chai.request(server).post("/users").send({});
 
+        console.log(response.body)
         expect(response).to.have.status(400);
         expect(response.body.object).to.equal("error");
         expect(response.body.code).to.equal("validation");
         expect(response.body.errors).to.eql({
-          email: "Email is required",
+          username: "Email is required",
+          confirmPassword: "Confirm password is required",
           "name.firstName": "First name is required",
           "name.lastName": "Last name is required",
-          dateOfBirth: "Date of birth is required",
-          role: "Role is required",
+          password: "Password is required",
         });
       });
     });
@@ -91,18 +105,18 @@ describe("POST /users", () => {
 });
 
 describe("GET /users", function () {
-  describe("when authenticated", () => {
+  describe("when authenticated", async () => {
+    const admin = await createAdmin();
+    const token = createJwt(admin);
+
     describe("when filtered not given", () => {
       it("responds with list of users", async () => {
-        const admin = await createAdmin();
-        const token = createJwt(admin);
-
         await Promise.all(
           Array(4)
             .fill(0)
             .map((_, index) => {
               return createUser({
-                email: `john${index}@wuna.com`,
+                username: `john${index}@wuna.com`,
               });
             })
         );
@@ -114,21 +128,18 @@ describe("GET /users", function () {
 
         expect(response).to.have.status(200);
         expect(response.body.status).to.be.equal("success");
-        expect(response.body.data.length).to.be.equal(4);
+        expect(response.body.users.length).to.be.equal(4);
       });
     });
 
     describe("when filter is given", () => {
       it("responds with list of users", async () => {
-        const admin = await createAdmin();
-        const token = createJwt(admin);
-
         await Promise.all(
           Array(4)
             .fill(0)
             .map((_, index) => {
               return createUser({
-                email: `johnapproved${index}@wuna.com`,
+                username: `johnapproved${index}@wuna.com`,
               });
             })
         );
@@ -138,7 +149,7 @@ describe("GET /users", function () {
             .fill(0)
             .map((_, index) => {
               return createUser({
-                email: `johnnew${index}@wuna.com`,
+                username: `johnnew${index}@wuna.com`,
               });
             })
         );
@@ -150,7 +161,7 @@ describe("GET /users", function () {
 
         expect(response).to.have.status(200);
         expect(response.body.status).to.be.equal("success");
-        expect(response.body.data.length).to.be.equal(4);
+        expect(response.body.users.length).to.be.equal(4);
       });
     });
   });
@@ -167,16 +178,17 @@ describe("GET /users", function () {
   });
 });
 
-describe("GET /users/search", () => {
-  describe("when authenticated", () => {
-    describe("when email is not present in query params", () => {
+xdescribe("GET /users/search", async () => {
+  const username = "test@wuna.com";
+  const user = await createAdmin({username});
+  const token = createJwt(user);
+  xdescribe("when authenticated", () => {
+    xdescribe("when username is not present in query params", () => {
       it("responds with validation error", async () => {
-        const user = await createAdmin();
-        const token = createJwt(user);
 
         const response = await chai
           .request(server)
-          .get("/users/search?email=")
+          .get("/users/search?username=")
           .set("Authorization", `Bearer ${token}`);
 
         expect(response).to.have.status(400);
@@ -186,16 +198,12 @@ describe("GET /users/search", () => {
       });
     });
 
-    describe("when invalid email is present in query params", () => {
+    xdescribe("when invalid username is present in query params", () => {
       it("responds with validation error", async () => {
-        const email = "test@wuna.com";
-        const user = await createAdmin({ email });
-        const token = createJwt(user);
-
         const response = await chai
           .request(server)
           .get("/users/search")
-          .query({ email: "random" })
+          .query({ username: "random" })
           .set("Authorization", `Bearer ${token}`);
 
         expect(response).to.have.status(400);
@@ -205,36 +213,30 @@ describe("GET /users/search", () => {
       });
     });
 
-    describe("when user present", () => {
+    xdescribe("when user present", () => {
       it("responds with user", async () => {
-        const email = "admin@wuna.com";
-        const user = await createAdmin({ email });
-        const token = createJwt(user);
 
         const response = await chai
           .request(server)
           .get("/users/search")
-          .query({ email: "admin@wuna.com" })
+          .query({ username: "admin@wuna.com" })
           .set("Authorization", `Bearer ${token}`);
 
         expect(response).to.have.status("200");
         expect(response.body.object).to.equal("user");
         expect(response.body.status).to.equal("successful");
-        expect(response.body.user.email).to.be.a("string");
+        expect(response.body.user.username).to.be.a("string");
         expect(response.body.user.role).to.be.a("string");
       });
     });
 
-    describe("when user is not present", () => {
+    xdescribe("when user is not present", () => {
       it("responds with user not found", async () => {
-        const email = "admin@wuna.com";
-        const user = await createAdmin({ email });
-        const token = createJwt(user);
 
         const response = await chai
           .request(server)
           .get("/users/search")
-          .query({ email: "test@test.com" })
+          .query({ username: "test@test.com" })
           .set("Authorization", `Bearer ${token}`);
 
         expect(response).to.have.status(404);
@@ -244,11 +246,11 @@ describe("GET /users/search", () => {
     });
   });
 
-  describe("when unauthenticated", () => {
+  xdescribe("when unauthenticated", () => {
     it("responds with authentication error", async () => {
       const response = await chai
         .request(server)
-        .get("/users/search?email=john@gmail.com");
+        .get("/users/search?username=john@gmail.com");
 
       expect(response).to.have.status(401);
       expect(response.body.object).to.equal("error");
@@ -258,18 +260,18 @@ describe("GET /users/search", () => {
   });
 });
 
-describe("PUT /users/:id", () => {
+describe("PUT /users/:id", async() => {
+  const user = await createUser();
+  const token = createJwt(user);
   describe("when authenticated", () => {
     describe("when id is invalid", () => {
       it("responds with user not found error", async () => {
-        const user = await createUser();
-        const token = createJwt(user);
 
         const response = await chai
           .request(server)
           .put("/users/random")
           .send({
-            email: "user@email.com",
+            username: "user@email.com",
             name: {
               firstName: "John",
               lastName: "Doe",
@@ -287,8 +289,6 @@ describe("PUT /users/:id", () => {
 
     describe("when required fields are missing or invalid", () => {
       it("responds with user_validation_error", async () => {
-        const user = await createUser();
-        const token = createJwt(user);
 
         const response = await chai
           .request(server)
@@ -300,7 +300,7 @@ describe("PUT /users/:id", () => {
         expect(response.body.object).to.be.equal("error");
         expect(response.body.code).to.be.equal("validation");
         expect(response.body.errors).to.eql({
-          email: "Email is required",
+          username: "Email is required",
           dateOfBirth: "Date of birth is required",
           "name.firstName": "First name is required",
           "name.lastName": "Last name is required",
@@ -310,14 +310,12 @@ describe("PUT /users/:id", () => {
 
     describe("when valid id and valid required fields", () => {
       it("responds with updated user", async () => {
-        const user = await createUser();
-        const token = createJwt(user);
 
         const response = await chai
           .request(server)
           .put(`/users/${user.id}`)
           .send({
-            email: "newuser@email.com",
+            username: "newuser@email.com",
             role: Roles.USER,
             dateOfBirth: Date("1990-01-01"),
             name: {
@@ -329,7 +327,7 @@ describe("PUT /users/:id", () => {
 
         expect(response.body.object).to.be.equal("user");
         expect(response.body.status).to.be.equal("updated");
-        expect(response.body.user.email).to.exist;
+        expect(response.body.user.username).to.exist;
         expect(response.body.user.role).to.exist;
         expect(response.body.user.dateOfBirth).to.exist;
         expect(response.body.user.name).to.exist;
