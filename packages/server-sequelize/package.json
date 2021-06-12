@@ -1,0 +1,47 @@
+{
+  "name": "server",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "nodemon bin/www.js",
+    "dev": "DOTENV_CONFIG_PATH=.env.development DEBUG=LMGMT nodemon --inspect -r dotenv/config bin/www.js",
+    "test": "DOTENV_CONFIG_PATH=.env.test mocha --timeout 10000 -r dotenv/config \"test/**/*.test.js\"",
+    "prettier:fix": "prettier --write .",
+    "prettier:check": "prettier --check .",
+    "lint:check": "eslint ./src",
+    "lint:fix": "eslint --fix ./src",
+    "precommit": "lint-staged"
+  },
+  "dependencies": {
+    "cookie-parser": "~1.4.4",
+    "cors": "^2.8.5",
+    "debug": "~2.6.9",
+    "dotenv": "^8.2.0",
+    "express": "~4.16.1",
+    "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.20",
+    "morgan": "~1.9.1",
+    "passport": "^0.4.0",
+    "passport-jwt": "^4.0.0",
+    "passport-local": "^1.0.0",
+    "password-hash": "^1.2.2",
+    "rotating-file-stream": "^2.1.5",
+    "sequelize": "^6.6.2",
+    "yup": "^0.31.0"
+  },
+  "devDependencies": {
+    "chai": "^4.3.4",
+    "chai-http": "^4.3.0",
+    "eslint": "^7.22.0",
+    "mocha": "^8.3.2",
+    "nodemon": "^2.0.7",
+    "prettier": "^2.2.1"
+  },
+  "lint-staged": {
+    "*.js": [
+      "./node_modules/.bin/eslint --fix ./src",
+      "git add"
+    ]
+  }
+}
