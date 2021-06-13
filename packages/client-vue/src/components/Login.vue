@@ -52,12 +52,15 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          alert('submit!');
+          this.routeTo('/new-record');
         } else {
           console.log('error submit!!');
           return false;
         }
       });
+    },
+    routeTo(path){
+      this.$router.push(path);
     },
     resetForm(formName) {
       this.$refs[formName].resetFields();
