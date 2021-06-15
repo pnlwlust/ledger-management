@@ -1,4 +1,16 @@
-import {ElButton, ElCard, ElContainer, ElForm, ElFormItem, ElInput, ElMain} from 'element-plus'
+import {
+  ElAside,
+  ElButton,
+  ElCalendar,
+  ElCard,
+  ElContainer,
+  ElFooter,
+  ElForm,
+  ElFormItem,
+  ElHeader,
+  ElInput,
+  ElMain
+} from 'element-plus'
 
 export default (app) => {
   app.use(ElContainer)
@@ -8,4 +20,8 @@ export default (app) => {
   app.use(ElFormItem)
   app.use(ElInput)
   app.use(ElButton)
+  app.use(ElCalendar)
+  app.use(ElHeader)
+  app.use(ElAside)
+  app.use(ElFooter)
 }

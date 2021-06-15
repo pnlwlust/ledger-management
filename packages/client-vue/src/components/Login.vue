@@ -52,9 +52,10 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.routeTo('/new-record');
+          this.$emit('loggedIn' , true);
         } else {
           console.log('error submit!!');
+          this.$emit('loggedIn' , false);
           return false;
         }
       });

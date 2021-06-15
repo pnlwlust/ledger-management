@@ -11,15 +11,28 @@
       <el-form-item label="Item Name" prop="itemName">
         <el-input type="text" v-model="newRecordForm.itemName" autocomplete="off"></el-input>
       </el-form-item>
+      <el-form-item label="Item Description" prop="itemDescription">
+        <el-input type="text" v-model="newRecordForm.itemDescription" autocomplete="off"></el-input>
+      </el-form-item>
       <el-form-item label="Item Price Code" prop="priceCode">
-        <el-input type="password" v-model="newRecordForm.priceCode" autocomplete="off"></el-input>
+        <el-input type="text" v-model="newRecordForm.priceCode" autocomplete="off"></el-input>
       </el-form-item>
       <el-form-item label="Sell Price" prop="sellPrice">
-        <el-input type="password" v-model="newRecordForm.sellPrice" autocomplete="off"></el-input>
+        <el-input type="number" v-model="newRecordForm.sellPrice" autocomplete="off"></el-input>
+      </el-form-item>
+      <el-form-item label="Category" prop="itemCategory">
+        <el-select v-model="newRecordForm.category" placeholder="Select">
+          <el-option
+              v-for="item in newRecordForm.categories"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+          </el-option>
+        </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="submitForm('loginForm')">Submit</el-button>
-        <el-button @click="resetForm('loginForm')">Reset</el-button>
+        <el-button type="primary" @click="submitForm('newRecordForm')">Submit</el-button>
+        <el-button @click="resetForm('newRecordForm')">Reset</el-button>
       </el-form-item>
     </el-form>
   </el-card>
@@ -34,8 +47,11 @@ export default {
         date: '',
         itemCode: '',
         itemName: '',
+        itemDescription: '',
         priceCode: '',
         sellPrice: '',
+        category:'',
+        categories:[{value:'', label:''}]
       },
       rules: {
       }
