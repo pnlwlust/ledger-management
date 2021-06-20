@@ -29,12 +29,12 @@ var server = http.createServer(app);
 server.listen(port, () => {
   // eslint-disable-next-line no-console
   console.log(`Server started at ${port}`);
-  console.log(`Environment: ${process.env.NODE_ENV}`)
+  console.log(`Environment: ${process.env.NODE_ENV}`);
 });
 server.on("error", onError);
 server.on("listening", onListening);
 
-export {server};
+export { server };
 /**
  * Normalize a port into a number, string, or false.
  */

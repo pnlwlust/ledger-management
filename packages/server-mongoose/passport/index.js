@@ -24,7 +24,7 @@ export default () => {
         passwordField: "password",
       },
       (username, password, cb) =>
-        UserRepository.findByUsername( username )
+        UserRepository.findByUsername(username)
           .then((user) => {
             if (!user) {
               return cb(null, null);

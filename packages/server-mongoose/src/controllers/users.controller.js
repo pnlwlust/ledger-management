@@ -44,12 +44,12 @@ export async function createUser(req, res, next) {
 
 export async function getUser(req, res, next) {
   try {
-    const {id} = req.params;
+    const { id } = req.params;
     const user = await userService.getUser(id);
     res.status(200).send({
       status: "success",
       object: "user",
-        user
+      user,
     });
   } catch (err) {
     next(err);
@@ -58,12 +58,12 @@ export async function getUser(req, res, next) {
 
 export async function updateUser(req, res, next) {
   try {
-    const {id} = req.params;
+    const { id } = req.params;
     const user = await userService.updateUser(id, req.data);
     res.status(200).send({
       status: "updated",
       object: "user",
-      user
+      user,
     });
   } catch (err) {
     next(err);
@@ -72,12 +72,12 @@ export async function updateUser(req, res, next) {
 
 export async function listUsers(req, res, next) {
   try {
-    const {offset = 0, limit = 10} = req.body;
-    const users = await userService.listUsers({offset, limit});
+    const { offset = 0, limit = 10 } = req.body;
+    const users = await userService.listUsers({ offset, limit });
     res.status(200).send({
       status: "success",
       object: "user",
-      users
+      users,
     });
   } catch (err) {
     next(err);
@@ -89,9 +89,9 @@ export async function deleteUser(req, res, next) {
     const { id } = req.params;
     const user = await userService.deleteUser(id);
     return res.status(200).json({
-      object: 'user',
-      status: 'deleted',
-      user
+      object: "user",
+      status: "deleted",
+      user,
     });
   } catch (error) {
     return next(error);
@@ -103,9 +103,9 @@ export async function resetPassword(req, res, next) {
     const { id } = req.params;
     const user = await userService.resetPassword(id, req.data);
     return res.status(200).json({
-      object: 'user',
-      status: 'password_reset',
-      user
+      object: "user",
+      status: "password_reset",
+      user,
     });
   } catch (error) {
     return next(error);

@@ -7,12 +7,18 @@ export function createUser(params) {
   const { username, password, confirmPassword, role, name } = params;
 
   if (password !== confirmPassword)
-    throw new ResponseError( "Password Mismatch" );
+    throw new ResponseError("Password Mismatch");
 
   // const usernameExist = await UserRepository.findUserByUsername(username);
   // if (usernameExist) throw { status: 413, error: 'Username already taken' };
 
-  return UserRepository.create({ username, password, role, firstName:name.firstName, lastName:name.lastName });
+  return UserRepository.create({
+    username,
+    password,
+    role,
+    firstName: name.firstName,
+    lastName: name.lastName,
+  });
 }
 
 export function updateUser(id, params) {

@@ -1,22 +1,24 @@
 import chai from "chai";
 import chaiHttp from "chai-http";
-import  {server}  from "../../bin/www.js";
+import { server } from "../../bin/www.js";
 import User from "../../src/models/users.model.js";
 import Roles from "../../src/models/roles.enum.js";
 
 import { createUser, createAdmin } from "../factory.js";
-import {createJwt} from "../../src/services/auth.service.js";
+import { createJwt } from "../../src/services/auth.service.js";
 import mongoose from "mongoose";
 
 const { expect } = chai;
 chai.use(chaiHttp);
 before(function (done) {
-  mongoose.connect(process.env.MONGOOSE_TEST_URI || 'mongodb://localhost/test', {
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useFindAndModify: false
-
-  });
+  mongoose.connect(
+    process.env.MONGOOSE_TEST_URI || "mongodb://localhost/test",
+    {
+      useNewUrlParser: true,
+      useCreateIndex: true,
+      useFindAndModify: false,
+    }
+  );
   done();
 });
 
@@ -30,17 +32,16 @@ describe("POST /users/login", function () {
   const password = "password";
   beforeEach(async function () {
     await createUser({ username, password });
-  })
+  });
   afterEach(async function () {
     await mongoose.connection.db.dropDatabase();
-  })
+  });
   describe("when passing correct username and password", async () => {
     const response = await chai
-        .request(server)
-        .post("/users/login")
-        .send({ username, password });
+      .request(server)
+      .post("/users/login")
+      .send({ username, password });
     it("responds with bearer token", async () => {
-
       expect(response).to.have.status(201);
       expect(response.body.object).to.equal("token");
       expect(response.body.status).to.equal("created");
@@ -88,7 +89,7 @@ describe("POST /users", () => {
       it("responds with validation error", async () => {
         const response = await chai.request(server).post("/users").send({});
 
-        console.log(response.body)
+        console.log(response.body);
         expect(response).to.have.status(400);
         expect(response.body.object).to.equal("error");
         expect(response.body.code).to.equal("validation");
@@ -180,12 +181,11 @@ describe("GET /users", function () {
 
 xdescribe("GET /users/search", async () => {
   const username = "test@wuna.com";
-  const user = await createAdmin({username});
+  const user = await createAdmin({ username });
   const token = createJwt(user);
   xdescribe("when authenticated", () => {
     xdescribe("when username is not present in query params", () => {
       it("responds with validation error", async () => {
-
         const response = await chai
           .request(server)
           .get("/users/search?username=")
@@ -215,7 +215,6 @@ xdescribe("GET /users/search", async () => {
 
     xdescribe("when user present", () => {
       it("responds with user", async () => {
-
         const response = await chai
           .request(server)
           .get("/users/search")
@@ -232,7 +231,6 @@ xdescribe("GET /users/search", async () => {
 
     xdescribe("when user is not present", () => {
       it("responds with user not found", async () => {
-
         const response = await chai
           .request(server)
           .get("/users/search")
@@ -260,13 +258,12 @@ xdescribe("GET /users/search", async () => {
   });
 });
 
-describe("PUT /users/:id", async() => {
+describe("PUT /users/:id", async () => {
   const user = await createUser();
   const token = createJwt(user);
   describe("when authenticated", () => {
     describe("when id is invalid", () => {
       it("responds with user not found error", async () => {
-
         const response = await chai
           .request(server)
           .put("/users/random")
@@ -289,7 +286,6 @@ describe("PUT /users/:id", async() => {
 
     describe("when required fields are missing or invalid", () => {
       it("responds with user_validation_error", async () => {
-
         const response = await chai
           .request(server)
           .put(`/users/${user.id}`)
@@ -310,7 +306,6 @@ describe("PUT /users/:id", async() => {
 
     describe("when valid id and valid required fields", () => {
       it("responds with updated user", async () => {
-
         const response = await chai
           .request(server)
           .put(`/users/${user.id}`)

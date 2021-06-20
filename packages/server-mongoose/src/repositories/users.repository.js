@@ -20,7 +20,7 @@ const UserRepository = {
     const name = { firstName, middleName, lastName };
     return User.create({ username, password, role, name });
   },
-  update: (id, {firstName, middleName, lastName }) => {
+  update: (id, { firstName, middleName, lastName }) => {
     console.log(`Updating user ${id}`);
     const name = { firstName, middleName, lastName };
     const user = User.findById(id);
@@ -39,18 +39,18 @@ const UserRepository = {
     const user = await User.findById(id);
     if (!user) throw new UserNotFound();
 
-    return user
+    return user;
   },
   findAll(options) {
-    return User.find({where:{...options}});
+    return User.find({ where: { ...options } });
   },
 
-  delete: async (id) =>{
+  delete: async (id) => {
     if (!mongoose.Types.ObjectId.isValid(id)) throw new UserNotFound();
 
     const user = await UserRepository.findById(id);
 
     return user.delete();
-  }
+  },
 };
 export default UserRepository;

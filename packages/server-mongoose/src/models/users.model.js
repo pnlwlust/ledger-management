@@ -18,7 +18,7 @@ const Name = new Schema(
 
 const UserSchema = new Schema(
   {
-    username: { type: String, required: true, unique: true, email:true },
+    username: { type: String, required: true, unique: true, email: true },
     password: { type: String, required: true },
     token: [{ type: String }],
     resetToken: [{ type: String }],
